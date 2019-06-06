@@ -124,3 +124,10 @@ body {
 .loading {
   text-align: center;
 }
+
+button,
+textarea {
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+}
