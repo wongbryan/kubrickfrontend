@@ -1,7 +1,7 @@
 import React from "react";
 import ImageUploader from "react-images-upload";
 import Loading from "./Loading";
-import { encodePicture, encodeText } from "../api/api";
+import { encodePicture, encodeText, decodePicture } from "../api/api";
 import { Form, TextArea } from "react-form";
 
 class KubrickUploader extends React.Component {
@@ -15,30 +15,62 @@ class KubrickUploader extends React.Component {
       res: null
     };
     this.onChange = this.onChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleEncode = this.handleEncode.bind(this);
+    this.handleDecode = this.handleDecode.bind(this);
   }
 
   onChange(pictures) {
     this.setState({
-      pictures: this.state.pictures.concat(pictures[0])
+      pictures
     });
   }
 
-  async handleSubmit() {
+  async handleDecode() {
     if (this.state.pictures.length === 1) {
-      this.setState({ err: "Please upload at least one image." });
+      this.setState({
+        err: null,
+        loading: true
+      });
+      const res = await decodePicture(this.state.pictures[0]);
+      if (res.err) {
+        this.setState({ err: res.err, loading: false });
+      } else {
+        this.setState({ res: res.data, loading: false });
+      }
+    } else {
+      this.setState({ err: "Please upload exactly one image to decode" });
     }
-    this.setState({
-      err: null,
-      loading: true
-    });
+  }
+
+  async handleEncode() {
     console.log(this.state);
-    if (this.state.pictures.length === 2) {
+    if (this.state.pictures.length === 1 && this.state.textValue === "") {
       // if encoding picture
       console.log("encoding picture");
-      const res = await encodePicture(
+      this.setState({
+        err: null,
+        loading: true
+      });
+      const res = await encodePicture(this.state.pictures[0]);
+      console.log(res);
+      if (res.err) {
+        this.setState({ err: res.err, loading: false });
+      } else {
+        console.log(res);
+        this.setState({ res: res.data, loading: false });
+      }
+    } else if (
+      this.state.pictures.length === 1 &&
+      this.state.textValue !== ""
+    ) {
+      // if encoding text
+      this.setState({
+        err: null,
+        loading: true
+      });
+      const res = await encodeText(
         this.state.pictures[0],
-        this.state.pictures[1]
+        this.state.textValue
       );
       console.log(res);
       if (res.err) {
@@ -47,44 +79,54 @@ class KubrickUploader extends React.Component {
         console.log(res);
         this.setState({ res: res.data, loading: false });
       }
-      return;
-    } else if (this.state.pictures.length === 1) {
-      // if encoding text or binary
+    } else {
+      this.setState({ err: "Invalid submission state" });
     }
   }
 
   render() {
     return (
-      <div className="main">
-        <h1>Kubrick</h1>
-        <p>A least significant bit image encoder.</p>
-        {!this.state.loading && (
-          <div>
-            <ImageUploader
-              className="uploader"
-              onChange={this.onChange}
-              imgExtension={[".png"]}
-              label="Max file size: 5mb, accepted: png"
-              singleImage={true}
-              withPreview={true}
-            />
-            <textarea
-              value={this.state.textValue}
-              onChange={e => this.setState({ textValue: e.target.value })}
-            >
-              Hello
-            </textarea>
-            <button onClick={this.handleSubmit}>Submit</button>
-          </div>
-        )}
-        {this.state.loading && <Loading />}
-        {this.state.err && (
-          <div className="error">
-            <p>
-              {"There was an error: " + this.state.err + ". Please try again"}
-            </p>
-          </div>
-        )}
+      <div>
+        <div className="main">
+          <h1>Kubrick</h1>
+          <p>A least significant bit image encoder.</p>
+          {!this.state.loading && (
+            <div>
+              <ImageUploader
+                className="uploader"
+                onChange={this.onChange}
+                imgExtension={[".png"]}
+                label="Max file size: 5mb, accepted: png"
+                singleImage={true}
+                withPreview={true}
+              />
+              <textarea
+                value={this.state.textValue}
+                onChange={e => this.setState({ textValue: e.target.value })}
+              >
+                Hello
+              </textarea>
+              <button onClick={this.handleEncode}>Encode</button>
+              <button onClick={this.handleDecode}>Decode</button>
+            </div>
+          )}
+          {this.state.loading && <Loading />}
+          {this.state.err && (
+            <div className="error">
+              <p>
+                {"There was an error: " + this.state.err + ". Please try again"}
+              </p>
+            </div>
+          )}
+        </div>
+        <div className="instructions">
+          <p>
+            To decode an image: upload one image, do not enter text and hit
+            decode.
+          </p>
+          <p>To encode an image: upload one image and hit encode.</p>
+          <p>To encode text: enter text and hit encode.</p>
+        </div>
       </div>
     );
   }

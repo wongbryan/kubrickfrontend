@@ -131,3 +131,15 @@ textarea {
   margin: auto;
   margin-top: 10px;
 }
+
+.instructions {
+  position: absolute;
+  bottom: 30px;
+  text-align: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.instructions p {
+  margin: 5px;
+}
