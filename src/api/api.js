@@ -3,6 +3,9 @@ const API_URL = "http://localhost:3001";
 // Takes a picture File object and sends a post
 const upload = async picture => {
   try {
+    console.log(picture);
+    // const fd = new FormData();
+    // fd.append("upl", localStorage.myfile, "blobby.txt");
     const res = await fetch(API_URL + "/upload", {
       method: "POST",
       body: JSON.stringify(picture)
