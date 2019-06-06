@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3001";
+const API_URL = "http://localhost:5000/api";
 
 // Takes a picture File object and sends a post
 const encodePicture = async (carrier, picture) => {
