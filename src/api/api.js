@@ -26,14 +26,15 @@ const encodePicture = async picture => {
   }
 };
 
-const encodeText = async (picture, text) => {
+const encodeText = async text => {
   try {
-    const fd = new FormData();
-    fd.append("upl", picture, "encodingImage.blob");
+    const body = { text };
     const res = await fetch(API_URL + "/text_encode", {
       method: "POST",
-      textValue: text,
-      body: fd
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json"
+      }
     });
     return {
       err: null,
@@ -71,4 +72,29 @@ const decodePicture = async picture => {
   }
 };
 
-export { encodePicture, encodeText, decodePicture };
+const decodeText = async picture => {
+  try {
+    const fd = new FormData();
+    // fd.append("carrier", carrier, "carrier.blob");
+    fd.append("encoded_img", picture, "encoded_img.png");
+    const res = await fetch(API_URL + "/text_decode", {
+      method: "POST",
+      body: fd
+    });
+    console.log(res);
+    const res_parsed = await res.blob();
+    if (res_parsed.err) {
+      throw new Error(res_parsed.err);
+    }
+    return {
+      err: null,
+      data: res_parsed
+    };
+  } catch (err) {
+    return {
+      err
+    };
+  }
+};
+
+export { encodePicture, encodeText, decodePicture, decodeText };
