@@ -5,14 +5,19 @@ const encodePicture = async picture => {
   try {
     const fd = new FormData();
     // fd.append("carrier", carrier, "carrier.blob");
-    fd.append("picture", picture, "picture.blob");
+    fd.append("picture", picture, "picture.png");
     const res = await fetch(API_URL + "/image_encode", {
       method: "POST",
       body: fd
     });
+    console.log(res);
+    const res_parsed = await res.blob();
+    if (res_parsed.err) {
+      throw new Error(res_parsed.err);
+    }
     return {
       err: null,
-      data: res
+      data: res_parsed
     };
   } catch (err) {
     return {
@@ -45,14 +50,19 @@ const decodePicture = async picture => {
   try {
     const fd = new FormData();
     // fd.append("carrier", carrier, "carrier.blob");
-    fd.append("picture", picture, "picture.blob");
+    fd.append("encoded_img", picture, "encoded_img.png");
     const res = await fetch(API_URL + "/image_decode", {
       method: "POST",
       body: fd
     });
+    console.log(res);
+    const res_parsed = await res.blob();
+    if (res_parsed.err) {
+      throw new Error(res_parsed.err);
+    }
     return {
       err: null,
-      data: res
+      data: res_parsed
     };
   } catch (err) {
     return {

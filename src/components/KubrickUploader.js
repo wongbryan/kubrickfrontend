@@ -2,6 +2,7 @@ import React from "react";
 import ImageUploader from "react-images-upload";
 import Loading from "./Loading";
 import { encodePicture, encodeText, decodePicture } from "../api/api";
+import download from "downloadjs";
 import { Form, TextArea } from "react-form";
 
 class KubrickUploader extends React.Component {
@@ -29,12 +30,15 @@ class KubrickUploader extends React.Component {
     if (this.state.pictures.length === 1) {
       this.setState({
         err: null,
+        res: null,
         loading: true
       });
       const res = await decodePicture(this.state.pictures[0]);
+      console.log(res);
       if (res.err) {
         this.setState({ err: res.err, loading: false });
       } else {
+        download(res.data, "original.png");
         this.setState({ res: res.data, loading: false });
       }
     } else {
@@ -43,12 +47,12 @@ class KubrickUploader extends React.Component {
   }
 
   async handleEncode() {
-    console.log(this.state);
     if (this.state.pictures.length === 1 && this.state.textValue === "") {
       // if encoding picture
       console.log("encoding picture");
       this.setState({
         err: null,
+        res: null,
         loading: true
       });
       const res = await encodePicture(this.state.pictures[0]);
@@ -56,7 +60,7 @@ class KubrickUploader extends React.Component {
       if (res.err) {
         this.setState({ err: res.err, loading: false });
       } else {
-        console.log(res);
+        download(res.data, "result.png");
         this.setState({ res: res.data, loading: false });
       }
     } else if (
