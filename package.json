@@ -10,7 +10,7 @@
     "react-form": "^3.5.7",
     "react-images-upload": "^1.2.6",
     "react-loading-bar": "0.0.7",
-    "react-scripts": "3.0.1"
+    "react-scripts": "5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
